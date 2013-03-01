@@ -63,6 +63,16 @@ describe Her::Model::Paths do
           Foo::User.collection_path "/organizations/:organization_id/utilisateurs"
           expect { Foo::User.build_request_path(:id => "foo") }.to raise_error(Her::Errors::PathError)
         end
+
+        it "builds paths with custom collection path but don't mutate the given params hash" do
+          Foo::User.collection_path "/organizations/:organization_id/utilisateurs"
+          original_params = { :id => "foo", :_organization_id => "acme" }
+          params = original_params.dup
+
+          Foo::User.build_request_path(params).should == "/organizations/acme/utilisateurs/foo"
+
+          params.should eq original_params
+        end
       end
     end
 
